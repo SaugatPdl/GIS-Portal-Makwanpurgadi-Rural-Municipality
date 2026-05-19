@@ -541,6 +541,20 @@ const ResizeMapOnLayoutChange = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
     };
   }, [map, sidebarOpen]);
 
+  useEffect(() => {
+    const handleViewportChange = () => {
+      map.invalidateSize({ animate: false });
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("orientationchange", handleViewportChange);
+
+    return () => {
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("orientationchange", handleViewportChange);
+    };
+  }, [map]);
+
   return null;
 };
 
@@ -842,7 +856,7 @@ const DetailPanel = ({
     : [];
 
   return (
-    <aside className="w-full lg:w-[360px] bg-gradient-to-b from-[#E8F1FF] via-[#F7FBFF] to-[#FFFFFF] border-t lg:border-t-0 lg:border-l border-[#CADCF5] shrink-0 overflow-y-auto custom-scrollbar">
+    <aside className="w-full shrink-0 border-t border-[#CADCF5] bg-gradient-to-b from-[#E8F1FF] via-[#F7FBFF] to-[#FFFFFF] lg:w-[360px] lg:border-l lg:border-t-0 lg:overflow-y-auto custom-scrollbar">
       <div className="p-5 sm:p-6 space-y-5">
         {selectedPoint ? (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -1037,16 +1051,16 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#FDFBF7] overflow-hidden font-sans selection:bg-[#DC143C]/20">
+    <div className="min-h-dvh bg-[#FDFBF7] font-sans selection:bg-[#DC143C]/20 lg:flex lg:h-dvh lg:flex-col lg:overflow-hidden">
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+      <main className="relative flex flex-col lg:min-h-0 lg:flex-1 lg:flex-row lg:overflow-hidden">
         <AnimatePresence initial={false}>
           {isSidebarOpen && (
             <motion.aside
               initial={{ x: -18, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -18, opacity: 0 }}
-              className="absolute top-0 left-0 bottom-0 w-[86vw] max-w-[320px] lg:relative lg:w-[300px] lg:max-w-none bg-white border-r-2 border-slate-200 flex flex-col z-40 overflow-hidden"
+              className="absolute left-0 top-0 z-40 flex h-[58dvh] min-h-[360px] max-h-[620px] w-[86vw] max-w-[320px] flex-col overflow-hidden border-r-2 border-slate-200 bg-white lg:relative lg:h-auto lg:min-h-0 lg:max-h-none lg:w-[300px] lg:max-w-none"
             >
               <div className="p-4 sm:p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
                 <div className="space-y-3">
@@ -1165,7 +1179,7 @@ export default function App() {
         <button
           onClick={() => setSidebarOpen(!isSidebarOpen)}
           className={cn(
-            "absolute top-24 lg:top-1/2 lg:-translate-y-1/2 z-50 bg-white border border-slate-200 p-2 rounded-full shadow-xl hover:bg-orange-50 transition-all hover:scale-110 active:scale-90",
+            "absolute top-24 z-50 rounded-full border border-slate-200 bg-white p-2 shadow-xl transition-all hover:scale-110 hover:bg-orange-50 active:scale-90 lg:top-1/2 lg:-translate-y-1/2",
             isSidebarOpen
               ? "left-[calc(min(86vw,320px)+12px)] lg:left-[304px]"
               : "left-3",
@@ -1178,7 +1192,7 @@ export default function App() {
           )}
         </button>
 
-        <div className="flex-1 relative bg-slate-100 min-h-[40vh] lg:min-h-0">
+        <div className="relative h-[58dvh] min-h-[360px] max-h-[620px] shrink-0 bg-slate-100 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
